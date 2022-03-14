@@ -88,6 +88,13 @@ const renderCards = (data) => {
 };
 
 
+
+const filterData = () => {
+    const date = new Date();
+    date.setDate(date.getDate() - searchPeriod.value);
+    return data.filter((item) => new Date(item.date).getTime() > date);
+}
+
 const sortData = () => {
     switch (orderBy.value) {
         case 'down':
@@ -99,14 +106,8 @@ const sortData = () => {
         default:
             data.sort((a, b) => new Date(a.date).getTime() > new Date(b.date).getTime() ? 1 : -1);
     }
+    return filterData();
 };
-
-const filterData = () => {
-    const date = new Date();
-    date.setDate(date.getDate() - searchPeriod.value);
-    return data.filter((item) => new Date(item.date).getTime() > date);
-}
-
 
 const optionHandler = () => {
 
@@ -126,8 +127,8 @@ const optionHandler = () => {
         if (target.classList.contains('option__item')) {
             optionBtnOrder.textContent = target.textContent;
             orderBy.value = target.dataset.sort;
-            sortData();
-            renderCards(data);
+            const newData = sortData();
+            renderCards(newData);
             optionListOrder.classList.remove('option__list_active');
             for (const elem of optionListOrder.querySelectorAll('.option__item')) {
                 if (elem === target) {
@@ -174,8 +175,8 @@ const cityHandler = () => {
                 [hash]: target.textContent,
             }
             data = await getData(option);
-            sortData();
-            renderCards(data);
+            const newData = sortData();
+            renderCards(newData);
             topCityBtn.textContent = target.textContent;
             city.classList.remove('city_active');
         }
@@ -311,8 +312,8 @@ const searchHandler = () => {
         if (textSearch.length > 2) {
             formSearch.search.style.borderColor = '';
             data = await getData({ search: textSearch });
-            sortData();
-            renderCards(data);
+            const newData = sortData();
+            renderCards(newData);
             found.innerHTML = `
                 ${declOfNum(data.length, ['вакансия', 'вакансии', 'вакансий'])} &laquo;${textSearch}&raquo;
             `;
@@ -327,9 +328,8 @@ const searchHandler = () => {
 };
 const init = async () => {
     data = await getData();
-    sortData();
-    data = filterData();
-    renderCards(data);
+    const newData = sortData();
+    renderCards(newData);
 
     optionHandler();
 
